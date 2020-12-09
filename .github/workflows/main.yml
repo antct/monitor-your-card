@@ -1,0 +1,40 @@
+name: monitor your card
+ 
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron:  '0 0 * * *'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: monitor-hello
+        if: ${{ github.event_name == 'push' }}
+        env:
+          ECARD_USERNAME: ${{ secrets.ECARD_USERNAME }}
+          ECARD_PASSWORD: ${{ secrets.ECARD_PASSWORD }}
+          DINGDING_TOKEN: ${{ secrets.DINGDING_TOKEN }}
+          DINGDING_SECRET: ${{ secrets.DINGDING_SECRET }}
+        run: |
+          pip install -r requirements.txt
+          python main.py hello
+        
+      - name: monitor-run
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          ECARD_USERNAME: ${{ secrets.ECARD_USERNAME }}
+          ECARD_PASSWORD: ${{ secrets.ECARD_PASSWORD }}
+          DINGDING_TOKEN: ${{ secrets.DINGDING_TOKEN }}
+          DINGDING_SECRET: ${{ secrets.DINGDING_SECRET }}
+        run: |
+          pip install -r requirements.txt
+          python main.py run
